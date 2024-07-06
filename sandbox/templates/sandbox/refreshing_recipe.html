@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% if recipes %}
+  {% if refreshing %}
     <ul>
-      {% for recipe in recipes %}
+      {% for recipe in refreshing %}
         <li>
           <a href="{% url "sandbox:recipe_detail" recipe.id %}">{{ recipe.name }}</a>
+          Description:
+          <p>{{ recipe.description }}</p>
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>No recipes found.</p>
+    <p>No refreshing recipe found.</p>
   {% endif %}
 {% endblock content %}
