@@ -1,11 +1,13 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import ListView, DetailView
 
 from recipes.models import Recipe
+from sandbox.form import FeedbackForm
+from sandbox.models import Feedback
 
 # Create your views here.
 def index(request):
@@ -34,3 +36,29 @@ class SpecificRecipesView(View):
     refreshing_recipes = Recipe.objects.filter(description__icontains="refreshing")
     context = {"refreshing": refreshing_recipes}
     return render(request, "sandbox/refreshing_recipe.html", context)
+  
+def thank_you(request):
+  return HttpResponse("Thank you for your feedback")
+  
+def feedback(request):
+  if request.method == "POST":
+    form = FeedbackForm(request.POST)
+    if form.is_valid():
+      # process the form
+      print(form.cleaned_data)
+      name = form.cleaned_data["name"]
+      email = form.cleaned_data["email"]
+      feedback = form.cleaned_data["feedback"]
+      satisfaction = form.cleaned_data["satisfaction"]
+      Feedback.objects.create(
+        name=name,
+        email=email,
+        feedback=feedback,
+        satisfaction=satisfaction
+      )
+      return redirect('sandbox:thank_you')
+  else:
+    form = FeedbackForm()
+    
+  context = {"form": form}
+  return render(request, "sandbox/feedback_form.html", context)

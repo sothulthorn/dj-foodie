@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+
+from foodie_app.form import CategoryForm, RecipeForm
 from .models import Category
 from recipes.models import Recipe
 
@@ -16,3 +18,35 @@ def recipes(request, category_id):
   context = {"recipes": recipes, "category": category}
   
   return render(request, "foodie_app/recipes.html", context)
+
+def add_category(request):
+  if request.method == "POST":
+    form = CategoryForm(request.POST)
+    if form.is_valid():
+      form.save()
+      return redirect("foodie_app:index")
+    else:
+      return render(request, "foodie_app/add_category.html")
+  else:
+    form = CategoryForm()
+    context = {"form": form}
+    return render(request, "foodie_app/add_category.html", context)
+
+def add_recipe(request, category_id=None):
+  category = None
+  if category_id:
+    category = get_object_or_404(Category, id=category_id)
+    form = RecipeForm(request.POST or None, initial={"category": category})
+  else:
+    form = RecipeForm(request.POST or None)
+  
+  if request.method == 'POST' and form.is_valid():
+    new_recipe = form.save()
+    return redirect("foodie_app:recipes", category_id=new_recipe.category.id)
+  
+  context = {
+    "form": form,
+    "category": category
+  }
+  return render(request, "foodie_app/add_recipe.html", context)
+  

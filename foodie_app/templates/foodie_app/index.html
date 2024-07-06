@@ -3,6 +3,7 @@
 {% block content %}
   <h3>Categories</h3>
   <div>
+    <a href="{% url "foodie_app:add_category" %}">Add Categories</a>
     {% for category in categories %}
       <div>
         <a href="{% url "foodie_app:recipes" category.id %}">{{ category.name }}</a>
